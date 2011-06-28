@@ -1,0 +1,20 @@
+<?php
+// $Id$ 
+
+/**
+ * @file 
+ */
+
+/**
+ * Implementation of hook_install() 
+ */
+function namespaces_install() {
+
+}
+
+/**
+ * Implementation of hook_uninstall() 
+ */
+function namespaces_uninstall() {
+  cache_clear_all('available_namespaces');
+}

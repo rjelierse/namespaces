@@ -1,0 +1,77 @@
+<?php
+// $Id$ 
+
+/**
+ * @file Module that handles adding extra namespaces to a Drupal environment.
+ * 
+ * Each module that provides a custom namespace should implement 
+ * hook_namespaces(). This hook returns an associative array containing
+ * a namespace as key and a unique identifier as value.
+ */
+
+/**
+ * Implementation of hook_hook_info()
+ */
+function namespaces_hook_info() {
+  return array(
+    'namespaces' => array(
+      'namespaces' => array(
+        'namespaces' => array(
+          'runs when' => t('The final page is being build, to establish extra namespaces that need adding')
+        )
+      )
+    )
+  );
+}
+
+/**
+ * Implementation of hook_preprocess_page().
+ * 
+ * Adds an extra variable to each page, containing the namespace definitions.
+ */
+function namespaces_preprocess_page(&$variables) {
+  $namespaces = namespaces_list_available();
+  $nss = array();
+  foreach ($namespaces as $ns => $id) {
+    $nss[] = sprintf('xml:%s="%s"', $ns, $id);
+  }
+  if (!empty($ns)) {
+    $variables['namespaces'] = implode(' ', $nss);
+  }
+  else {
+    $variables['namespaces'] = '';
+  }
+}
+
+/**
+ * Return the list of namespaces that have been defined by modules.
+ * 
+ * @return A list of available namespaces that have been defined previously.
+ */
+function namespaces_list_available() {
+  $namespaces = cache_get('available_namespaces');
+  if (!is_array($namespaces)) {
+    $namespaces = module_invoke_all('namespaces');
+    foreach ($namespaces as $ns => $id) {
+      if ((strlen($ns) < 1) || (strlen($id) < 1)) {
+        // Remove empty entries
+        unset ($namespaces[$ns]);
+      }
+    }
+    cache_set('available_namespaces', $namespaces, 'cache', CACHE_TEMPORARY);
+  }
+
+  return $namespaces;
+}
+
+/**
+ * Check whether a namespace has been defined.
+ * 
+ * @param $namespace The namespace to check.
+ * @return TRUE if a namespace exists, FALSE if otherwise.
+ */
+function namespaces_is_available($namespace) {
+  $namespaces = namespaces_list_available();
+
+  return isset($namespaces[$namespace]);
+}

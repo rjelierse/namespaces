@@ -1,0 +1,6 @@
+; $Id$ 
+name = Namespaces
+description = Implements an hook to add extra namespaces to Drupal
+package = Other
+version = 6.x-1.0
+core = 6.x
